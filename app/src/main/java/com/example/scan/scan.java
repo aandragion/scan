@@ -230,12 +230,13 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
 //                                                Toast.makeText(scan.this, "Position: " + which + " Value: " + kursi[which], Toast.LENGTH_LONG).show();
 //                                            }
 //                                        });
+                                        final boolean finalStatus_checked = status_checked;
                                         builder.setMultiChoiceItems(kursi
                                                 , checkedkursi, new DialogInterface.OnMultiChoiceClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 //                                                        Toast.makeText(scan.this, "Position: " + which + " Value: " + kursi[which] + " State: " + (isChecked ? "checked" : "unchecked"), Toast.LENGTH_LONG).show();
-                                                        checkedkursi[which] = status_checked;
+                                                        checkedkursi[which] = finalStatus_checked;
                                                     }
                                                 }
                                         );
