@@ -45,8 +45,8 @@ import static android.Manifest.permission.CAMERA;
 public class scan extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
     public String scanResult;
-    public String id_pesan;
-    public JSONObject kursis;
+    public String id_pesan, keyVal, key, key1;
+
     private BaseApiService apiInterface;
     private static final int REQUEST_CAMERA = 1;
     ProgressDialog loading;
@@ -68,48 +68,8 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
                 requestPermission();
             }
         }
-//        initViews();
-
-//        recyclerView = findViewById(R.id.listkursi);
-//        layoutManager = new LinearLayoutManager(scan.this);
-//        recyclerView.setLayoutManager(layoutManager);
-//        recyclerView.setHasFixedSize(true);
-//        kirim = findViewById(R.id.button);
-//        kirim.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                String name = txtInputName.getText().toString();
-////                txtName.setText(name);
-//                customDialog.dismiss();
-//            }
-//        });
     }
 
-    //    private void initViews(){
-//        initCustomDialog();
-//        createTable("" + scanResult);
-//    }
-//
-//    private void initCustomDialog(){
-//        customDialog = new Dialog(scan.this);
-//        customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        customDialog.setContentView(R.layout.custom_dialog);
-//        customDialog.setCancelable(true);
-//
-//        recyclerView = customDialog.findViewById(R.id.listkursi);
-//        layoutManager = new LinearLayoutManager(this);
-//        recyclerView.setLayoutManager(layoutManager);
-//        recyclerView.setHasFixedSize(true);
-//        kirim = customDialog.findViewById(R.id.button);
-//        kirim.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                String name = txtInputName.getText().toString();
-////                txtName.setText(name);
-//                customDialog.dismiss();
-//            }
-//        });
-//    }
     private boolean checkPermission() {
         return (ContextCompat.checkSelfPermission(scan.this, CAMERA) ==
                 PackageManager.PERMISSION_GRANTED);
@@ -146,38 +106,9 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
     public void handleResult(Result result) {
         mScannerView.resumeCameraPreview(this);
         scanResult = result.getText();
-//        createTable("" + scanResult);
-
         requestScan(scanResult);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(scan.this);
-//        builder.setTitle("Scan Result");
-//        builder.setMessage("" + id_pesan);
-//        AlertDialog alert1 = builder.create();
-//        alert1.show();
     }
 
-    //    private void createTable(String type) {
-//        apiInterface = UtilsApi.getAPIService();
-//
-//        Call<List<list_kursi>> call = apiInterface.getKursi(type);
-//        call.enqueue(new Callback<List<list_kursi>>() {
-//            @Override
-//            public void onResponse(Call<List<list_kursi>> call, Response<List<list_kursi>> response) {
-//                listkursi = response.body();
-//                adapter = new ad_kursi(listkursi, scan.this, appendBooked);
-//                recyclerView.setAdapter(adapter);
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<list_kursi>> call, Throwable t) {
-//
-//                Toast.makeText(scan.this, "Error\n" + t.toString(), Toast.LENGTH_LONG).show();
-//            }
-//        });
-////        room = new Room(this,tableLayout, titleTextView, ROW, COL, filmDatabase.getSeats(showId));
-////
-//    }
     private void requestScan(String hasil_scan) {
         loading = ProgressDialog.show(scan.this, null, "Harap Tunggu...", true, false);
         mApiService.scanRequest(hasil_scan)
@@ -191,75 +122,65 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
                                 if (jsonRESULTS.getString("error").equals("false")) {
                                     String success_msg = jsonRESULTS.getString("error_msg");
                                     Toast.makeText(mContext, success_msg, Toast.LENGTH_SHORT).show();
+//                                    id_pesan = jsonRESULTS.getJSONObject("user").getString("kursi");
+//                                    final String[] kursi = id_pesan.split("\\s+");
+//                                    final boolean[] checkedkursi = new boolean[kursi.length];
+//                                    final boolean status_checked[] = new boolean[kursis.length()];
 
-                                    id_pesan = jsonRESULTS.getJSONObject("user").getString("kursi");
-                                    final String[] kursi = id_pesan.split("\\s+");
-                                    final boolean[] checkedkursi = new boolean[kursi.length];
-                                    boolean status_checked = false;
-//                                    for(int i=0; i<kursi.length; i++) {
-//                                        Toast.makeText(scan.this, kursi[i], Toast.LENGTH_SHORT). show() ;
-//                                    }
+                                    JSONArray arr = jsonRESULTS.getJSONArray("dipesan");
+                                    {
+                                        for (int i = 0; i < arr.length(); i++) {
+                                            key = arr.getJSONObject(i).getString("kursi");
+//                                            Toast.makeText(mContext, "dipesan " + key, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    JSONArray arr1 = jsonRESULTS.getJSONArray("ditempati"); {
+                                        for (int j = 0; j < arr1.length(); j++) {
+                                            key1 = arr1.getJSONObject(j).getString("s_kursi");
+//                                            Toast.makeText(mContext, " ditempati" + key1, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+//                                    final String dipesan[] = {key};
+                                    final boolean status_checked[] = new boolean[key.length()];
                                     AlertDialog.Builder builder = new AlertDialog.Builder(scan.this);
                                     builder.setTitle("Scan Result");
-                                    for (int i = 0; i < kursi.length; i++) {
-//                                        final List<String> colorsList = Arrays.asList(kursi);
-                                        kursis = jsonRESULTS.getJSONObject("user");
-                                        for (int j = 0; j < kursis.length(); ++j) {
-
-                                            JSONObject jsn = kursis.getJSONObject(String.valueOf(j));
-
-                                            String keyVal = jsn.getString("s_kursi");
-
-                                            if (kursi.equals(keyVal)) {
-                                                status_checked = true;
+//                                    Toast.makeText(mContext, "dipesan " + dipesan, Toast.LENGTH_SHORT).show();
+                                    for (int i=0; i< key.length(); i++) {
+                                        for ( int j=0; j< key1.length(); j++ ) {
+                                            if (key.equals(key1)) {// Status checked diubah ke true;
+                                                status_checked[i] = true;
                                             }
-                                            Toast.makeText(mContext, keyVal, Toast.LENGTH_SHORT).show();
                                         }
-//                                        builder.setMessage((CharSequence) colorsList);
-//                                        builder.setMultiChoiceItems(kursi,checkedkursi,new DialogInterface.OnMultiChoiceClickListener(){
-//                                            @Override
-//                                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-//                                                String currentItem = colorsList.get(which);
-//                                                Toast.makeText(getApplicationContext(),
-//                                                        currentItem + " " + isChecked, Toast.LENGTH_SHORT).show();
-//                                            }
-//                                        });
-//                                        builder.setItems(kursi, new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialog, int which) {
-//                                                Toast.makeText(scan.this, "Position: " + which + " Value: " + kursi[which], Toast.LENGTH_LONG).show();
-//                                            }
-//                                        });
-                                        final boolean finalStatus_checked = status_checked;
-                                        builder.setMultiChoiceItems(kursi
-                                                , checkedkursi, new DialogInterface.OnMultiChoiceClickListener() {
+
+
+                                        builder.setMultiChoiceItems(new String[]{key}, status_checked, new DialogInterface.OnMultiChoiceClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-//                                                        Toast.makeText(scan.this, "Position: " + which + " Value: " + kursi[which] + " State: " + (isChecked ? "checked" : "unchecked"), Toast.LENGTH_LONG).show();
-                                                        checkedkursi[which] = finalStatus_checked;
+//                                                        checkedkursi[which] = isChecked;
                                                     }
                                                 }
                                         );
 
                                     }
-                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int id) {
-//                                                String dataPilih = "";
-                                            StringBuilder stringBuilder = new StringBuilder();
-                                            for (int i = 0; i < kursi.length; i++) {
-                                                if (checkedkursi[i]) {
-                                                    stringBuilder.append(kursi[i]);
-                                                    stringBuilder.append(" ");
-//                                                        dataPilih += kursi[i] + " ";
-                                                    checkedkursi[i] = false;
-                                                }
-                                            }
-                                            String dataPilih = "" + stringBuilder.toString().trim();
-                                            requestnonton(dataPilih, scanResult);
-//                                                Toast.makeText(scan.this, dataPilih, Toast.LENGTH_LONG).show();
-                                        }
-                                    });
+//                                    kursis = jsonRESULTS.getJSONObject("user");
+
+//                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int id) {
+//                                            StringBuilder stringBuilder = new StringBuilder();
+//                                            for (int i = 0; i < kursi.length; i++) {
+//                                                if (checkedkursi[i]) {
+//                                                    stringBuilder.append(kursi[i]);
+//                                                    stringBuilder.append(" ");
+////                                                        dataPilih += kursi[i] + " ";
+//                                                    checkedkursi[i] = false;
+//                                                }
+//                                            }
+//                                            String dataPilih = "" + stringBuilder.toString().trim();
+//                                            requestnonton(dataPilih, scanResult);
+//                                        }
+//                                    });
                                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int id) {
@@ -269,32 +190,14 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
                                     AlertDialog alert1 = builder.create();
                                     alert1.show();
 
-                                    kursis = jsonRESULTS.getJSONObject("user");
-                                    for (int i = 0; i < kursis.length(); ++i) {
-
-                                        JSONObject jsn = kursis.getJSONObject(String.valueOf(i));
-
-                                        String keyVal = jsn.getString("s_kursi");
-
-//                                        if( kursi.equals( keyVal )  ) {
-//                                            holder.itemView.setEnabled(false);
-//                                            holder.kursi.setBackgroundColor(Color.parseColor("#E94818"));
-//                                        }
-                                        Toast.makeText(mContext, keyVal, Toast.LENGTH_SHORT).show();
-                                    }
-//                                    AlertDialog.Builder builder = new AlertDialog.Builder(scan.this);
-//                                    builder.setTitle("Scan Result");
-//                                    builder.setMessage("" +id_pesan);
+//                                    kursis = jsonRESULTS.getJSONObject("user");
+//                                    for (int i = 0; i < kursis.length(); ++i) {
 //
-//                                    AlertDialog alert1 = builder.create();
-//                                    alert1.show();
-//                                    onResume();
-//                                    Intent pindahActivity = new Intent(scan.this, coba.class);
-//                                    pindahActivity.putExtra("jumlah", id_pesan);
-//                                    startActivity(pindahActivity);
-//                                    startActivity(new Intent(mContext, MainActivity.class)
-//                                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
-//                                    finish();
+//                                        JSONObject jsn = kursis.getJSONObject(String.valueOf(i));
+//
+//                                        String keyVal = jsn.getString("s_kursi");
+//                                        Toast.makeText(mContext, keyVal, Toast.LENGTH_SHORT).show();
+//                                    }
                                 } else {
                                     // Jika login gagal
                                     String error_message = jsonRESULTS.getString("error_msg");
@@ -331,13 +234,6 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
                                 if (jsonRESULTS.getString("error").equals("false")) {
                                     String success_msg = jsonRESULTS.getString("error_msg");
                                     Toast.makeText(mContext, success_msg, Toast.LENGTH_SHORT).show();
-
-//                                    Intent pindahActivity = new Intent(scan.this, coba.class);
-//                                    pindahActivity.putExtra("jumlah", id_pesan);
-//                                    startActivity(pindahActivity);
-//                                    startActivity(new Intent(mContext, MainActivity.class)
-//                                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
-//                                    finish();
                                 } else {
                                     // Jika login gagal
                                     String error_message = jsonRESULTS.getString("error_msg");
