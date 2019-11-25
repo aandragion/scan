@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,7 +46,7 @@ import static android.Manifest.permission.CAMERA;
 public class scan extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
     public String scanResult;
-    public String id_pesan, keyVal, key, key1;
+    public String id_pesan, keyVal;
 
     private BaseApiService apiInterface;
     private static final int REQUEST_CAMERA = 1;
@@ -53,6 +54,11 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
     private Dialog customDialog;
     Context mContext;
     BaseApiService mApiService;
+
+    String key, key1;
+
+    ArrayList<String> dipesan;
+    ArrayList<String> ditempati;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,16 +127,20 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
                                 JSONObject jsonRESULTS = new JSONObject(response.body().string());
                                 if (jsonRESULTS.getString("error").equals("false")) {
                                     String success_msg = jsonRESULTS.getString("error_msg");
-                                    Toast.makeText(mContext, success_msg, Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(mContext, success_msg, Toast.LENGTH_SHORT).show();
 //                                    id_pesan = jsonRESULTS.getJSONObject("user").getString("kursi");
 //                                    final String[] kursi = id_pesan.split("\\s+");
 //                                    final boolean[] checkedkursi = new boolean[kursi.length];
 //                                    final boolean status_checked[] = new boolean[kursis.length()];
 
+                                    dipesan = new ArrayList<String>();
+                                    ditempati = new ArrayList<String>();
+
                                     JSONArray arr = jsonRESULTS.getJSONArray("dipesan");
                                     {
                                         for (int i = 0; i < arr.length(); i++) {
                                             key = arr.getJSONObject(i).getString("kursi");
+                                            dipesan.add(key);
 //                                            Toast.makeText(mContext, "dipesan " + key, Toast.LENGTH_SHORT).show();
                                         }
                                     }
@@ -138,49 +148,59 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
                                     JSONArray arr1 = jsonRESULTS.getJSONArray("ditempati"); {
                                         for (int j = 0; j < arr1.length(); j++) {
                                             key1 = arr1.getJSONObject(j).getString("s_kursi");
+                                            ditempati.add(key1);
 //                                            Toast.makeText(mContext, " ditempati" + key1, Toast.LENGTH_SHORT).show();
                                         }
                                     }
-//                                    final String dipesan[] = {key};
-                                    final boolean status_checked[] = new boolean[key.length()];
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(scan.this);
-                                    builder.setTitle("Scan Result");
-//                                    Toast.makeText(mContext, "dipesan " + dipesan, Toast.LENGTH_SHORT).show();
-                                    for (int i=0; i< key.length(); i++) {
-                                        for ( int j=0; j< key1.length(); j++ ) {
-                                            if (key.equals(key1)) {// Status checked diubah ke true;
+
+                                    String[] arr_key = new String[dipesan.size()];
+                                    String[] arr_key_1 = new String[ditempati.size()];
+
+                                    arr_key = dipesan.toArray(arr_key);
+                                    arr_key_1 = ditempati.toArray(arr_key_1);
+
+                                    final boolean status_checked[] = new boolean[arr_key.length];
+
+                                    for (int i=0; i< arr_key.length; i++) {
+                                        for (int j = 0; j < arr_key_1.length; j++) {
+                                            if (arr_key[i].equals(arr_key_1[j])) {// Status checked diubah ke true;
                                                 status_checked[i] = true;
                                             }
                                         }
+                                    }
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(scan.this);
+                                        builder.setTitle("Scan Result");
+//                                    Toast.makeText(mContext, "dipesan " + dipesan, Toast.LENGTH_SHORT).show();
 
 
-                                        builder.setMultiChoiceItems(new String[]{key}, status_checked, new DialogInterface.OnMultiChoiceClickListener() {
+
+                                        builder.setMultiChoiceItems(arr_key, status_checked, new DialogInterface.OnMultiChoiceClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-//                                                        checkedkursi[which] = isChecked;
+                                                        status_checked[which] = isChecked;
                                                     }
                                                 }
                                         );
 
-                                    }
 //                                    kursis = jsonRESULTS.getJSONObject("user");
 
-//                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(DialogInterface dialog, int id) {
-//                                            StringBuilder stringBuilder = new StringBuilder();
-//                                            for (int i = 0; i < kursi.length; i++) {
-//                                                if (checkedkursi[i]) {
-//                                                    stringBuilder.append(kursi[i]);
-//                                                    stringBuilder.append(" ");
-////                                                        dataPilih += kursi[i] + " ";
-//                                                    checkedkursi[i] = false;
-//                                                }
-//                                            }
-//                                            String dataPilih = "" + stringBuilder.toString().trim();
-//                                            requestnonton(dataPilih, scanResult);
-//                                        }
-//                                    });
+                                    final String[] finalArr_key = arr_key;
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            StringBuilder stringBuilder = new StringBuilder();
+                                            for (int i = 0; i < finalArr_key.length; i++) {
+                                                if (status_checked[i]) {
+                                                    stringBuilder.append(finalArr_key[i]);
+                                                    stringBuilder.append(" ");
+//                                                        dataPilih += kursi[i] + " ";
+                                                    status_checked[i] = false;
+                                                }
+                                            }
+                                            String dataPilih = "" + stringBuilder.toString().trim();
+                                            requestnonton(dataPilih, scanResult);
+                                        }
+                                    });
                                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int id) {
