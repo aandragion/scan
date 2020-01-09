@@ -169,7 +169,7 @@ public class scan extends AppCompatActivity implements ZXingScannerView.ResultHa
                                         }
                                     }
                                         AlertDialog.Builder builder = new AlertDialog.Builder(scan.this);
-                                        builder.setTitle("Scan Result");
+                                        builder.setTitle("Data kursi yang dipesan");
 //                                    Toast.makeText(mContext, "dipesan " + dipesan, Toast.LENGTH_SHORT).show();
 
 
